@@ -1,0 +1,41 @@
+#include <Servo.h>
+
+const int trigPin = 2; // Trigger pin of HCSR04
+const int echoPin = 3; // Echo pin of HCSR04
+Servo servoMotor;      // Servo motor for sanitizer dispenser
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  servoMotor.attach(9); // Connect servo signal pin to digital pin 9
+}
+
+void loop() {
+  long duration, distance;
+
+  // Triggering HCSR04 to measure distance
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  
+  // Calculating distance in centimeters
+  distance = (duration * 0.0343) / 2;
+
+  // Adjust this distance threshold based on your setup
+  if (distance < 10) { 
+    // If hands are within 10 cm, activate sanitizer dispenser
+    dispenseSanitizer();
+    delay(2000); // Adjust delay time as needed to control sanitizer duration
+  }
+}
+
+void dispenseSanitizer() {
+  // Rotate the servo motor to dispense sanitizer
+  servoMotor.write(90); // Adjust the angle based on your setup
+  delay(1000); // Adjust delay time as needed for sanitizer dispensing
+  servoMotor.write(0); // Return the servo motor to the initial position
+}
